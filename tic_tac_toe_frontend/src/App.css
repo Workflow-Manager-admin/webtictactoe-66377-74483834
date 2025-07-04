@@ -5,7 +5,8 @@
   --secondary: #607d8b;
   --accent: #ffcb05;
 
-  --bg-primary: #ffffff;
+  /* Custom user-preferred background color */
+  --bg-primary: #e0f7fa;
   --bg-secondary: #f8f9fa;
   --text-primary: #282c34;
   --text-secondary: #607d8b;
@@ -16,7 +17,7 @@
 
 [data-theme="dark"] {
   /* Dark theme colors */
-  --bg-primary: #1a1a1a;
+  --bg-primary: #263238;
   --bg-secondary: #282c34;
   --text-primary: #ffffff;
   --text-secondary: #61dafb;
