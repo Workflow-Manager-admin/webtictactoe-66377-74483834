@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import SnakeGame from './SnakeGame';
 
 /**
  * Color & Theme (per requirements):
@@ -43,20 +44,17 @@ function calculateWinner(squares) {
   return [null, []];
 }
 
-// PUBLIC_INTERFACE
 function App() {
-  // Board state: array of 9 (null | "X" | "O")
+  // Navigation between games
+  const [page, setPage] = useState('ttt'); // 'ttt' | 'snake'
+
+  // --- TTT state and logic (same as before) ---
   const [squares, setSquares] = useState(Array(9).fill(null));
-  // X goes first
   const [xIsNext, setXIsNext] = useState(true);
-  // Track winner/draw
   const [winner, setWinner] = useState(null);
   const [winningSquares, setWinningSquares] = useState([]);
-  // For draw
   const [isDraw, setIsDraw] = useState(false);
 
-  // Reset board state
-  // PUBLIC_INTERFACE
   const handleRestart = () => {
     setSquares(Array(9).fill(null));
     setXIsNext(true);
@@ -65,8 +63,6 @@ function App() {
     setWinningSquares([]);
   };
 
-  // Handle move
-  // PUBLIC_INTERFACE
   const handleSquareClick = idx => {
     if (winner || squares[idx] || isDraw) return;
     const nextSquares = squares.slice();
@@ -75,7 +71,6 @@ function App() {
     setXIsNext(!xIsNext);
   };
 
-  // Effects for winner and draw
   useEffect(() => {
     const [win, winSquares] = calculateWinner(squares);
     setWinner(win);
@@ -87,7 +82,6 @@ function App() {
     }
   }, [squares]);
 
-  // Status message
   let status;
   if (winner) {
     status = (
@@ -112,34 +106,100 @@ function App() {
     );
   }
 
+  /** Minimal top nav bar */
+  const TopNav = (
+    <header className="app-navbar" style={{
+      width: "100%",
+      background: "var(--bg-secondary)",
+      borderBottom: "1.8px solid var(--border-color)",
+      boxShadow: "0 2px 8px rgba(72,90,100,0.05)",
+      display: "flex", flexDirection: "row",
+      alignItems: "center", justifyContent: "center",
+      minHeight: 61,
+      zIndex: 51
+    }}>
+      <nav style={{
+        display: "flex", gap: 12, alignItems: "center", margin: "0 auto"
+      }}>
+        <button
+          style={{
+            fontSize: "1.08rem",
+            fontWeight: 600,
+            color: page === "ttt" ? "var(--primary)" : "var(--secondary)",
+            background: "none",
+            border: "none",
+            borderBottom: page === "ttt" ? "2.5px solid var(--primary)" : "2.5px solid transparent",
+            padding: "13px 28px 9px 28px",
+            cursor: "pointer",
+            outline: "none",
+            transition: "color .18s, border .18s"
+          }}
+          disabled={page === "ttt"}
+          onClick={() => setPage('ttt')}
+          aria-current={page === "ttt" ? "page" : undefined}
+        >
+          Tic Tac Toe
+        </button>
+        <button
+          style={{
+            fontSize: "1.08rem",
+            fontWeight: 600,
+            color: page === "snake" ? "var(--primary)" : "var(--secondary)",
+            background: "none",
+            border: "none",
+            borderBottom: page === "snake" ? "2.5px solid var(--primary)" : "2.5px solid transparent",
+            padding: "13px 24px 9px 24px",
+            cursor: "pointer",
+            outline: "none",
+            transition: "color .18s, border .18s"
+          }}
+          disabled={page === "snake"}
+          onClick={() => setPage('snake')}
+          aria-current={page === "snake" ? "page" : undefined}
+        >
+          Snake Game
+        </button>
+      </nav>
+    </header>
+  );
+
+  // --- Render ---
   return (
-    <div className="App ttt-app-root">
-      <main className="ttt-main-container">
-        <h1 className="ttt-title">Tic Tac Toe</h1>
-        <div className="ttt-status">{status}</div>
-        <div className="ttt-board-container">
-          <div className="ttt-board">
-            {squares.map((sq, idx) => (
-              <Square
-                key={idx}
-                value={sq}
-                isHighlighted={winningSquares.includes(idx)}
-                onClick={() => handleSquareClick(idx)}
-              />
-            ))}
-          </div>
+    <div className="App" style={{ minHeight: "100vh", minWidth: "100vw", background: "var(--bg-primary)", color: "var(--text-primary)" }}>
+      {TopNav}
+      {page === 'ttt' && (
+        <div className="ttt-app-root">
+          <main className="ttt-main-container">
+            <h1 className="ttt-title">Tic Tac Toe</h1>
+            <div className="ttt-status">{status}</div>
+            <div className="ttt-board-container">
+              <div className="ttt-board">
+                {squares.map((sq, idx) => (
+                  <Square
+                    key={idx}
+                    value={sq}
+                    isHighlighted={winningSquares.includes(idx)}
+                    onClick={() => handleSquareClick(idx)}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="ttt-controls">
+              <button className="ttt-restart-btn" onClick={handleRestart}>
+                Restart Game
+              </button>
+            </div>
+            <footer className="ttt-footer">
+              <span>
+                <span style={{color: "var(--primary)"}}>X</span> / <span style={{color: "var(--secondary)"}}>O</span> = two players <span style={{fontSize: "1.2em"}} role="img" aria-label="handshake">🤝</span>
+              </span>
+            </footer>
+          </main>
         </div>
-        <div className="ttt-controls">
-          <button className="ttt-restart-btn" onClick={handleRestart}>
-            Restart Game
-          </button>
-        </div>
-        <footer className="ttt-footer">
-          <span>
-            <span style={{color: "var(--primary)"}}>X</span> / <span style={{color: "var(--secondary)"}}>O</span> = two players <span style={{fontSize: "1.2em"}} role="img" aria-label="handshake">🤝</span>
-          </span>
-        </footer>
-      </main>
+      )}
+      {page === 'snake' && (
+        <SnakeGame />
+      )}
     </div>
   );
 }
